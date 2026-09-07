@@ -1,11 +1,11 @@
 # ConusSM1k
 
 Code accompanying the ConusSM1k data descriptor, including the manuscript
-figure builders and reference implementations of model selection and training.
+figure builders and examples illustrating model selection and training.
 
 ## Contents
 
-`model/hp_search_example.py` demonstrates FLAML CFO search scored by fivefold
+`model/hp_search_example.py` illustrates FLAML CFO search scored by fivefold
 spatially blocked cross-validation. The score gives each station equal weight,
 and the final configuration is chosen with a paired block-bootstrap one-standard-
 error rule followed by realized model size.
@@ -13,19 +13,19 @@ error rule followed by realized model size.
 For an independent spatial evaluation, reserve the outer holdout before running
 the search; its input should contain development stations only.
 
-`model/train_example.py` demonstrates a deterministic LightGBM fit using a
+`model/train_example.py` illustrates a deterministic LightGBM fit using a
 configuration selected previously. Both scripts accept a prepared CSV or
 Parquet modeling table and user-supplied column names.
 
-`figures/` contains the final plotting logic with descriptive filenames:
-
-- `fig_station_support.py`
-- `fig_predictor_importance.py`
-- `fig_depth_maps.py`
-- `fig_native_scale.py`
-- `fig_performance.py`
-- `fig_surface_comparison.py`
-- `fig_product_agreement.py`
+| Script | Manuscript figure |
+|---|---|
+| `fig_station_support.py` | Figure 1 |
+| `fig_predictor_importance.py` | Figures 3 and S3 |
+| `fig_depth_maps.py` | Figure 4 |
+| `fig_native_scale.py` | Figure 5 |
+| `fig_performance.py` | Figures 6, S1 and S2 |
+| `fig_surface_comparison.py` | Figure 7 |
+| `fig_product_agreement.py` | Figure 8 |
 
 ## Installation
 
