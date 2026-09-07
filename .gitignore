@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.venv/
+output/
+figure_data/
+product_data/
+.DS_Store
