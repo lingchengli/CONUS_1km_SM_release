@@ -1,12 +1,7 @@
-# ConusSM1k manuscript code
+# ConusSM1k
 
-Minimal code release accompanying the ConusSM1k data descriptor. It contains
-the manuscript figure builders and two generic examples of the model-selection
-and fitting procedure.
-
-The repository intentionally excludes source data, preprocessing, station QA,
-production prediction, upload utilities, trained models, the exact predictor
-list, selected layer configurations, and search logs.
+Code accompanying the ConusSM1k data descriptor, including the manuscript
+figure builders and reference implementations of model selection and training.
 
 ## Contents
 
@@ -20,8 +15,7 @@ the search; its input should contain development stations only.
 
 `model/train_example.py` demonstrates a deterministic LightGBM fit using a
 configuration selected previously. Both scripts accept a prepared CSV or
-Parquet modeling table and user-supplied column names; neither contains
-ConusSM1k-specific feature names or fitted parameters.
+Parquet modeling table and user-supplied column names.
 
 `figures/` contains the final plotting logic with descriptive filenames:
 
@@ -32,9 +26,6 @@ ConusSM1k-specific feature names or fitted parameters.
 - `fig_performance.py`
 - `fig_surface_comparison.py`
 - `fig_product_agreement.py`
-
-The conceptual workflow graphic has no associated analysis code and is not
-included.
 
 ## Installation
 
@@ -71,9 +62,8 @@ Use `--categorical column_name ...` when applicable. Run either script with
 
 ## Figures
 
-The plotting scripts read already-derived figure inputs. These inputs are not
-distributed in this code-only repository. Set their directory and the output
-directory before running a builder:
+Set the derived figure-input directory and output directory before running a
+builder:
 
 ```bash
 export CONUSSM_FIGURE_DATA=/path/to/derived_figure_inputs
