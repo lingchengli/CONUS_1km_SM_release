@@ -1,31 +1,13 @@
 # ConusSM1k
 
-Code accompanying the ConusSM1k data descriptor, including the manuscript
-figure builders and examples illustrating model selection and training.
+Code accompanying the ConusSM1k data descriptor. The repository provides
+model-development and visualization workflows supporting the study.
 
-## Contents
+## Overview
 
-`model/hp_search_example.py` illustrates FLAML CFO search scored by fivefold
-spatially blocked cross-validation. The score gives each station equal weight,
-and the final configuration is chosen with a paired block-bootstrap one-standard-
-error rule followed by realized model size.
-
-For an independent spatial evaluation, reserve the outer holdout before running
-the search; its input should contain development stations only.
-
-`model/train_example.py` illustrates a deterministic LightGBM fit using a
-configuration selected previously. Both scripts accept a prepared CSV or
-Parquet modeling table and user-supplied column names.
-
-| Script | Manuscript figure |
-|---|---|
-| `fig_station_support.py` | Figure 1 |
-| `fig_predictor_importance.py` | Figures 3 and S3 |
-| `fig_depth_maps.py` | Figure 4 |
-| `fig_native_scale.py` | Figure 5 |
-| `fig_performance.py` | Figures 6, S1 and S2 |
-| `fig_surface_comparison.py` | Figure 7 |
-| `fig_product_agreement.py` | Figure 8 |
+`model/` contains LightGBM workflows for spatially blocked hyperparameter
+search and deterministic model fitting. `figures/` contains the plotting
+workflows and shared visual configuration used for the study figures.
 
 ## Installation
 
@@ -35,11 +17,11 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-## Model examples
+## Model workflow
 
-The search example expects one row per observation and columns identifying the
-station and its coordinates. Feature and target columns are supplied at run
-time:
+The model scripts accept a prepared CSV or Parquet table. Feature, target,
+station, and coordinate columns are specified at run time. For an independent
+spatial evaluation, reserve the outer holdout before hyperparameter search.
 
 ```bash
 python model/hp_search_example.py prepared_table.csv \
@@ -58,12 +40,12 @@ python model/train_example.py prepared_table.csv \
 ```
 
 Use `--categorical column_name ...` when applicable. Run either script with
-`--help` for all options.
+`--help` for the available options.
 
 ## Figures
 
-Set the derived figure-input directory and output directory before running a
-builder:
+Configure the figure input and output locations before running a plotting
+workflow:
 
 ```bash
 export CONUSSM_FIGURE_DATA=/path/to/derived_figure_inputs
