@@ -15,6 +15,9 @@ spatially blocked cross-validation. The score gives each station equal weight,
 and the final configuration is chosen with a paired block-bootstrap one-standard-
 error rule followed by realized model size.
 
+For an independent spatial evaluation, reserve the outer holdout before running
+the search; its input should contain development stations only.
+
 `model/train_example.py` demonstrates a deterministic LightGBM fit using a
 configuration selected previously. Both scripts accept a prepared CSV or
 Parquet modeling table and user-supplied column names; neither contains

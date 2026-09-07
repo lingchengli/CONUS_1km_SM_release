@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Example LightGBM hyperparameter search with spatially blocked cross-validation.
 
-The input must already be a quality-controlled modeling table. Feature creation,
-data download, and product-specific preprocessing are intentionally out of scope.
+The input must already be a quality-controlled development table. Any independent
+outer holdout must be removed before this search is run. Feature creation, data
+download, and product-specific preprocessing are intentionally out of scope.
 """
 
 from __future__ import annotations
