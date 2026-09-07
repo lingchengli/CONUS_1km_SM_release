@@ -112,7 +112,10 @@ def main() -> int:
         paired[product] = (float(np.median(diff)), lo, hi)
     failures = {p: values for p, values in paired.items() if values[1] <= 0 <= values[2]}
     if failures:
-        raise RuntimeError(f'caption states that every paired 95% block-bootstrap interval excludes zero, but these do not: {failures}')
+        raise RuntimeError(
+            "paired 95% block-bootstrap intervals include zero for "
+            f"these comparisons: {failures}"
+        )
     for j, (metric, label, ref) in enumerate(METRICS):
         axis = fig.add_subplot(lower[0, j])
         axis.set_box_aspect(0.8)
