@@ -13,8 +13,6 @@ import pandas as pd
 
 
 def read_table(path: Path) -> pd.DataFrame:
-    if path.suffix.lower() in {".parquet", ".pq"}:
-        return pd.read_parquet(path)
     return pd.read_csv(path)
 
 

@@ -20,8 +20,7 @@ from matplotlib.colors import Normalize
 HALO = [patheffects.withStroke(linewidth=1.6, foreground='white')]
 DATA_ROOT = Path(os.environ.get('CONUSSM_PRODUCT_DATA', Path(__file__).resolve().parents[1] / 'product_data'))
 PRODUCT = DATA_ROOT / 'product'
-MASK = DATA_ROOT / 'conus_admin_mask_1k.nc'
-PMASK = DATA_ROOT / 'predictable_mask_2001_2025.nc'
+MASK = DATA_ROOT / 'conus_mask_1km.nc'
 CLIM_FIELDS = DATA_ROOT / 'depth_climatology.npz'
 LAYERS = [('L1', '0–5 cm'), ('L2', '5–15 cm'), ('L3', '15–30 cm'), ('L4', '30–60 cm'), ('L5', '60–100 cm')]
 DEFAULT_MONTH = '201207'
@@ -37,18 +36,9 @@ def smooth_density(density, sigma_bins: float=5.0):
     kernel = np.exp(-0.5 * (np.arange(-half, half + 1) / sigma_bins) ** 2)
     return np.convolve(density, kernel / kernel.sum(), mode='same')
 
-def predictable_cells(year: int) -> int:
-    """How many valid cells a month of `year` must carry."""
-    with nc.Dataset(PMASK) as dataset:
-        years = np.asarray(dataset.variables['year'][:])
-        hit = np.where(years == year)[0]
-        if hit.size != 1:
-            raise RuntimeError(f'{PMASK}: no single {year} slice; has {years.min()}-{years.max()}')
-        return int(np.asarray(dataset.variables['predictable'][int(hit[0])]).sum())
-
 def climatology_spec() -> dict:
     """The 2001-2025 mean field, on the same axes as a single month."""
-    return {'yyyymm': None, 'year': None, 'month': None, 'days': None, 'valid': None, 'label': '2001–2025 mean', 'out': 'depth_maps_climatology'}
+    return {'yyyymm': None, 'year': None, 'month': None, 'days': None, 'label': '2001–2025 mean', 'out': 'depth_maps_climatology'}
 
 def month_spec(yyyymm: str) -> dict:
     """Everything that varies with the displayed month, derived not restated."""
@@ -57,7 +47,7 @@ def month_spec(yyyymm: str) -> dict:
     year, month = (int(yyyymm[:4]), int(yyyymm[4:]))
     if not 1 <= month <= 12:
         raise SystemExit(f'--month has no month {month}')
-    return {'yyyymm': yyyymm, 'year': year, 'month': month, 'label': dt.date(year, month, 1).strftime('%B %Y'), 'days': calendar.monthrange(year, month)[1], 'valid': predictable_cells(year), 'out': 'depth_maps' if yyyymm == DEFAULT_MONTH else f'depth_maps_{yyyymm}'}
+    return {'yyyymm': yyyymm, 'year': year, 'month': month, 'label': dt.date(year, month, 1).strftime('%B %Y'), 'days': calendar.monthrange(year, month)[1], 'out': 'depth_maps' if yyyymm == DEFAULT_MONTH else f'depth_maps_{yyyymm}'}
 
 def read_layer(layer: str, spec: dict):
     """Monthly mean of one layer, with the grid checked against the record."""
@@ -80,11 +70,6 @@ def read_layer(layer: str, spec: dict):
     if not np.allclose([lon[0], lon[-1]], EXPECTED_LON_ENDPOINTS, rtol=0, atol=1e-10):
         raise RuntimeError(f'{path}: unexpected longitude endpoints')
     field = np.nanmean(stack, axis=0)
-    if int(np.isfinite(field).sum()) != spec['valid']:
-        raise RuntimeError(
-            f"{path}: {int(np.isfinite(field).sum())} valid cells != "
-            f"{spec['valid']} predictable in {spec['year']}"
-        )
     return (field, lat, lon)
 
 def conus_mask(lat, lon):
@@ -123,6 +108,10 @@ def main(spec: dict):
             elif not (np.array_equal(la, lat) and np.array_equal(lo, lon)):
                 raise RuntimeError(f'{layer}: grid differs from L1')
             fields.append(field)
+        reference_valid = np.isfinite(fields[0])
+        for (layer, _), field in zip(LAYERS[1:], fields[1:]):
+            if not np.array_equal(np.isfinite(field), reference_valid):
+                raise RuntimeError(f'{layer}: valid-cell mask differs from L1')
     inside = conus_mask(lat, lon)
     fields = [np.where(inside, f, np.nan) for f in fields]
     means = [float(np.nanmean(f)) for f in fields]

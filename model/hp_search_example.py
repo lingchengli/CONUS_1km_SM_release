@@ -1,22 +1,27 @@
 #!/usr/bin/env python3
 """Example LightGBM hyperparameter search with spatially blocked cross-validation.
 
-The input must already be a quality-controlled development table. Any independent
-outer holdout must be removed before this search is run. Feature creation, data
-download, and product-specific preprocessing are intentionally out of scope.
+The input is a quality-controlled development table with any independent outer
+holdout removed. The example focuses on spatial cross-validation and model
+selection.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import warnings
 from pathlib import Path
 
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
-from flaml import tune
-from flaml.tune.searcher.blendsearch import CFO
+with warnings.catch_warnings():
+    warnings.filterwarnings(
+        "ignore", message="flaml.automl is not available.*", category=UserWarning
+    )
+    from flaml import tune
+    from flaml.tune.searcher.blendsearch import CFO
 
 
 SEARCH_SPACE = {
@@ -34,8 +39,6 @@ SEARCH_SPACE = {
 
 
 def read_table(path: Path) -> pd.DataFrame:
-    if path.suffix.lower() in {".parquet", ".pq"}:
-        return pd.read_parquet(path)
     return pd.read_csv(path)
 
 
@@ -332,6 +335,7 @@ def main() -> int:
     }
     rendered = json.dumps(result, indent=2, sort_keys=True)
     if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(rendered + "\n")
     print(rendered)
     return 0
